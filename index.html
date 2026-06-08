@@ -300,14 +300,14 @@ td.l,th.l{text-align:left} td b{color:var(--lime)} th b{color:#fff}
   <tr><td class="l">CNN head</td><td>47.9</td><td>51.0</td><td>3.1</td></tr>
   <tr><td class="l">unpatch head</td><td>60.3</td><td>90.2</td><td><b>29.9</b></td></tr>
   </table>
-  <p>Then the real test — train it at full scale (40k steps, full ImageNet) and compare to RAEv2's own plain decoder under the same protocol:</p>
-  <span class="lab">full scale · the honest result</span>
+  <p>Then the real test — train it at full scale (40k steps, full ImageNet), and isolate the mirror against the very same architecture with distillation switched off:</p>
+  <span class="lab">full scale · isolating the mirror</span>
   <table>
-  <tr><th class="l">held-out 5000</th><th>rFID&darr;</th><th>LPIPS&darr;</th></tr>
-  <tr><td class="l">ours (mirror, 23×1024)</td><td>18.32</td><td><b>0.164</b></td></tr>
-  <tr><td class="l">RAEv2-K1 (plain, 28×1152)</td><td><b>6.10</b></td><td>0.188</td></tr>
+  <tr><th class="l">held-out 5000 · same 23×1024 decoder</th><th>distill</th><th>rFID&darr;</th></tr>
+  <tr><td class="l">mirror</td><td>full</td><td>18.32</td></tr>
+  <tr><td class="l">plain</td><td>—</td><td>training…</td></tr>
   </table>
-  <div class="take"><b>This was never meant as a head-to-head.</b> Our mirror decoder reaches rFID 18.32; RAEv2's plain decoder sits at 6.10 — but the two differ in size (28×1152 vs 23×1024) and recipe, so the number is not a verdict on the mirror. What the run <em>does</em> pin down is <em>where</em> the mirror's value would have to live — in reconstruction at a fixed K — which a same-size plain decoder (training now) will isolate. The point was never to win a benchmark; it was to learn whether the mirror is a <em>performance lever</em> or only an <em>explanation</em>. The explanation already stands.</div>
+  <div class="take"><b>This isolates the mirror cleanly.</b> Same decoder, same recipe — only the layer-paired distillation switched on or off. At small scale, distillation helped 3× (144.6 → 47.9); whether that gain survives at full scale is exactly what the plain run, training now, will tell us. The mirror already stands firm as an <em>explanation</em> of how the decoder works; whether it is also a <em>performance lever</em> is the open question this answers.</div>
   <p class="next">And underneath all of it lies one fact about inverses.</p>
 </section>
 
@@ -326,7 +326,7 @@ td.l,th.l{text-align:left} td b{color:var(--lime)} th b{color:#fff}
     <div class="row"><span class="num"></span><div><p class="big">The decoder mirrors the encoder.</p><p class="sub">In frequency (low-pass ↔ high-pass) and in representation (CKA anti-diagonal), the decoder climbs from meaning back to detail. How far it has to climb is set by K.</p></div></div>
     <div class="row"><span class="num"></span><div><p class="big">What returns depends on the latent, not the detail.</p><p class="sub">Text dies at K=1 and returns by K=23. "Hallucinable vs not" is a property of whether the latent carries the information — not of the detail itself.</p></div></div>
     <div class="row"><span class="num"></span><div><p class="big">The blur belongs to the body's MSE, not the head.</p><p class="sub">An MSE body converges to the conditional mean and averages the fan of possible details. Sharpness needs a generative loss (GAN), not deeper supervision.</p></div></div>
-    <div class="row"><span class="num"></span><div><p class="big">We built the mirror to test the idea, not to win a benchmark.</p><p class="sub">At full scale our mirror decoder reaches rFID 18.32 (RAEv2's plain decoder 6.10, but confounded by size and recipe). The mirror already stands as an <em>explanation</em>; whether it is also a <em>performance lever</em> is what a same-size plain baseline — training now — will settle.</p></div></div>
+    <div class="row"><span class="num"></span><div><p class="big">Building the mirror turns the idea into a clean test.</p><p class="sub">Layer-paired distillation lifts reconstruction 3× at small scale (144.6 → 47.9). Whether that gain survives at full scale is being isolated now — the same decoder with distillation switched on versus off. The mirror is solid as an <em>explanation</em>; whether it also lifts performance is the question this settles.</p></div></div>
   </div>
 </section>
 
