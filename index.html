@@ -270,7 +270,7 @@ td.l,th.l{text-align:left} td b{color:var(--lime)} th b{color:#fff}
 
 <section class="block" id="ch6">
   <div class="chnum"><b>06</b> &nbsp;—&nbsp; Building It</div>
-  <h2>Building a decoder that mirrors — and the honest result</h2>
+  <h2>Building a decoder that mirrors, on purpose</h2>
   <p class="q">"If the decoder is the encoder's mirror, can we train one that way on purpose — and does it actually help?"</p>
   <p>Everything so far was observation on a frozen, pretrained RAEv2 decoder. The natural step is to <em>build</em> a decoder that is explicitly the encoder's mirror: 23 transformer blocks, each block <em>j</em> supervised to match encoder layer L(22−j) by MSE — layer-paired distillation — with a transparent unpatch head and a pixel L1 + LPIPS + GAN loss.</p>
   <span class="lab">our decoder</span>
