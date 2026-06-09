@@ -300,8 +300,14 @@ td.l,th.l{text-align:left} td b{color:var(--lime)} th b{color:#fff}
   <tr><td class="l">CNN head</td><td>47.9</td><td>51.0</td><td>3.1</td></tr>
   <tr><td class="l">unpatch head</td><td>60.3</td><td>90.2</td><td><b>29.9</b></td></tr>
   </table>
-  <div class="take"><b>This is the mirror earning its keep.</b> Once the head is an honest readout and the body has to carry the detail itself, aligning it to the encoder in the <em>right</em> order beats a shuffled one by a wide margin — a gap of 29.9. Let a CNN head absorb the detail instead, and that order all but vanishes (gap 3.1). So the layer-paired mirror is not decoration: it shows up in the pixels exactly when the body is the one forced to hallucinate.</div>
-  <p class="scap">The same isolation is running at full scale now (40k steps, full ImageNet): the mirror decoder reaches rFID 18.32, and a same-size plain decoder — distillation switched off — is training to tell us whether the gain survives at scale.</p>
+  <div class="take"><b>The mirror's order is a real mechanism.</b> Once the head is an honest readout and the body has to carry the detail itself, aligning it to the encoder in the <em>right</em> order beats a shuffled one by a wide margin — a gap of 29.9. Let a CNN head absorb the detail instead, and that order all but vanishes (gap 3.1). So the layer-paired mirror is not decoration: it shows up in the pixels exactly when the body is the one forced to hallucinate. Whether <em>forcing</em> that order is a good idea is a separate question — and the next test answers it.</div>
+  <p>So we ran the same isolation at full scale — the identical 23×1024 decoder, distillation on versus off, 40k steps on full ImageNet, everything else held fixed — to see whether the small-scale gain survives. It doesn't. It reverses.</p>
+  <table>
+  <tr><th class="l">full scale &nbsp;(40k, held-out 5000)</th><th>distill</th><th>rFID&darr;</th><th>LPIPS&darr;</th><th>PSNR&uarr;</th></tr>
+  <tr><td class="l">mirror &nbsp;(layer-paired)</td><td>full</td><td>18.32</td><td>0.164</td><td>16.96</td></tr>
+  <tr><td class="l">plain &nbsp;(no distill)</td><td>&mdash;</td><td><b>15.99</b></td><td><b>0.160</b></td><td>16.80</td></tr>
+  </table>
+  <div class="take"><b>We expected the mirror to help. At scale, it doesn't.</b> The small-scale 3× gain was low-data regularization, not a real lever — given enough data the plain decoder converges <em>past</em> the mirror (rFID 15.99 vs 18.32, and better LPIPS). Pinning every block to an encoder layer costs the decoder the freedom to synthesize realistic texture; it buys back only a sliver of pixel accuracy (PSNR/SSIM). The mirror is a faithful <em>description</em> of how a freely-trained decoder works — but imposed as a training constraint, it hurts. We thought there was an effect to harvest; we built it, and found there wasn't.</div>
   <p class="next">Step back, and the pieces line up.</p>
 </section>
 
@@ -313,7 +319,7 @@ td.l,th.l{text-align:left} td b{color:var(--lime)} th b{color:#fff}
     <div class="row"><span class="num"></span><div><p class="big">The decoder mirrors the encoder.</p><p class="sub">In frequency (low-pass ↔ high-pass) and in representation (the CKA anti-diagonal), the decoder climbs from meaning back toward detail. How far it has to climb is set by K.</p></div></div>
     <div class="row"><span class="num"></span><div><p class="big">What returns depends on the latent, not the detail.</p><p class="sub">Text dies at K=1 and returns by K=23. Whether a detail is "hallucinable" is a property of whether the latent carries it — not of the detail itself.</p></div></div>
     <div class="row"><span class="num"></span><div><p class="big">The mirror is a mechanism, not decoration.</p><p class="sub">When the head is an honest readout and the body must carry the detail, the layer-paired order is decisive — a shuffle costs ~30 rFID. Let a CNN head absorb the detail instead, and that order all but vanishes.</p></div></div>
-    <div class="row"><span class="num"></span><div><p class="big">Building the mirror turns the idea into a test.</p><p class="sub">Layer-paired distillation lifts reconstruction 3× at small scale (144.6 → 47.9); whether that survives at full scale is being isolated now — the same decoder, distillation on versus off. The mirror stands as an <em>explanation</em>; whether it also lifts performance is still open.</p></div></div>
+    <div class="row"><span class="num"></span><div><p class="big">We built the mirror on purpose — and it didn't help.</p><p class="sub">Layer-paired distillation lifts reconstruction 3× at small scale (144.6 → 47.9), so we forced it at full scale. The result reversed: the plain decoder reached rFID 15.99 against the mirror's 18.32 (and better LPIPS). The small-scale gain was low-data regularization. The mirror is a faithful <em>explanation</em> of how a free decoder organizes itself — not a performance lever. Pinned as a constraint, it costs realism. A clean negative result.</p></div></div>
   </div>
 </section>
 
